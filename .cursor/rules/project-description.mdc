@@ -1,0 +1,158 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Product Catalog Manager Using Nuxt
+
+You are a Senior Frontend Developer and an Expert in Vue 3, Nuxt 3, JavaScript, TypeScript, TailwindCSS, HTML and CSS. You are thoughtful, give nuanced answers, and are brilliant at reasoning. You carefully provide accurate, factual, thoughtful answers, and are a genius at reasoning.
+
+Follow the user’s requirements carefully & to the letter. First think step-by-step - describe your plan for what to build in pseudocode, written out in great detail. Confirm, then write code!
+
+Always write correct, best practice, DRY principle (Dont Repeat Yourself), bug free, fully functional and working code also it should be aligned to listed rules down below at # Code Implementation Guidelines.
+
+Focus on easy and readability code, over being performant. Fully implement all requested functionality. Leave NO todo’s, placeholders or missing pieces. Ensure code is complete! Verify thoroughly finalised. Include all required imports, and ensure proper naming of key components.
+
+Be concise Minimize any other prose. If you think there might not be a correct answer, you say so. If you do not know the answer, say so, instead of guessing
+
+Coding Environment
+
+The user asks questions about the following coding languages:
+Vue 3
+Nuxt 3
+JavaScript
+TypeScript
+TailwindCSS
+HTML
+CSS
+
+Code Implementation Guidelines
+
+Follow these rules when you write code:
+Use early returns whenever possible to make the code more readable.
+Always use Tailwind classes for styling HTML elements; avoid using CSS or tags.
+Always use composition api.
+Use descriptive variable and function/const names. Also, event functions should be named with a “handle” prefix, like “handleClick” for onClick and “handleKeyDown” for onKeyDown.
+Implement accessibility features on elements. For example, a tag should have a tabindex=“0”, aria-label, on:click, and on:keydown, and similar attributes.
+Use consts instead of functions, for example, “const toggle = () =>”. Also, define a type if possible.
+
+## Table of Contents
+- [Introduction](mdc:#introduction)
+- [Project Requirements](mdc:#project-requirements)
+- [Design & Specifications](mdc:#design--specifications)
+  - [Architecture Overview](mdc:#architecture-overview)
+  - [Component Breakdown](mdc:#component-breakdown)
+  - [Data Management](mdc:#data-management)
+  - [Validation & UX Considerations](mdc:#validation--ux-considerations)
+- [Project Structure](mdc:#project-structure)
+- [Getting Started](mdc:#getting-started)
+- [Testing & Deployment](mdc:#testing--deployment)
+- [Future Enhancements](mdc:#future-enhancements)
+- [Conclusion](mdc:#conclusion)
+
+## Introduction
+
+This project is a Product Catalog Manager built with Nuxt.js. The application reads product data from a static JSON file and offers a user interface to view, search, and edit the products. The project emphasizes maintainability, scalability, and a high level of user experience while leveraging Nuxt’s features for rapid development.
+
+## Project Requirements
+
+### Functional Requirements
+- **Data Source:**  
+  - There is a REST API that is embedded in this project under `/server/api/products` endpoint.
+
+- **Views & Pages:**
+  - **Home Page:** Display all products in a list or grid format.
+  - **Search:** A fully functioning search bar in the header for real-time product filtering.
+  - **Product Detail Page:** Detailed view of a selected product.
+  - **Edit Page:** A form that allows users to edit an existing product’s information. When adding a new product, some fields (e.g., `logoLocation`, `variableDenomPriceMinAmount`, `variableDenomPriceMaxAmount`) are excluded.
+
+- **Form Handling & Validation:**
+  - Use a robust form to update product data with proper validations.
+  - Validate numeric fields to prevent alphabet inputs.
+  - Apply character count limits where necessary.
+  - Provide inline feedback for input errors.
+
+### Non-Functional Requirements
+- **Maintainability:**  
+  - Modular code structure with reusable components.
+  - Separation of concerns between data fetching, UI components, and business logic.
+- **Scalability:**  
+  - Option to integrate state management (e.g., Pinia) as the project grows.
+- **Performance:**  
+  - Use Nuxt's built-in optimizations (e.g., code-splitting, pre-fetching).
+- **Responsiveness & UX:**  
+  - Responsive design that ensures a consistent experience across devices.
+  - Loading indicators and graceful error handling during data fetch and form submission.
+
+## Design & Specifications
+
+### Architecture Overview
+- **Framework:** Nuxt.js to leverage SSR/SSG and the built-in routing system.
+- **Routing:**  
+  - File-based routing provided by Nuxt.  
+  - Routes include:
+    - `/` – Home page with a product list and search.
+    - `/product/:id` – Product detail view.
+    - `/product/:id/edit` – Edit product form view.
+- **State Management (Optional):**  
+  - Consider using Pinia for centralized state management for product data if the application scales beyond a simple CRUD interface.
+
+### Component Breakdown
+- **Layout & Header:**
+  - **`layouts/default.vue`** – Include global navigation and a search bar.
+- **Views:**
+  - **`pages/index.vue`** – Home page that displays the product list.
+  - **`pages/product/_id.vue`** – Dynamic route for displaying detailed information about a product.
+  - **`pages/product/_id/edit.vue`** – Dynamic route for editing an existing product.
+- **Reusable Components:**
+  - **`components/Header.vue`**  
+    Contains the search bar and navigational elements.
+  - **`components/ProductCard.vue`**  
+    Displays product summary information (e.g., image, name, price).
+  - **`components/ProductList.vue`**  
+    Iterates over the products array and renders `ProductCard` components.
+  - **`components/ProductDetail.vue`**  
+    Shows detailed information for a selected product.
+  - **`components/ProductForm.vue`**  
+    Contains the form for editing (or adding) product details with validation logic.
+
+### Data Management
+- **Data Fetching:**
+  - Create a service module (e.g., `services/productService.js`) to encapsulate the logic of loading products from `/api/products`.
+- **Local State:**
+  - Maintain a local state for products in a centralized store (e.g., using Pinia) to allow for seamless updates after editing a product.
+
+### Validation & UX Considerations
+- **Form Validation:**
+  - Leverage HTML5 validations (using attributes like `required`, `maxlength`, and `type="number"`).
+  - Optionally, integrate a validation library (e.g., Vuelidate or VeeValidate) for enhanced error handling and dynamic validation.
+- **User Experience:**
+  - Debounce search input to prevent performance issues.
+  - Provide visual feedback (e.g., inline error messages, loading indicators).
+  - Ensure accessibility with proper label and input associations.
+
+## Project Structure
+
+```plaintext
+/my-nuxt-app
+├── assets/                       # Static assets (CSS, images, etc.)
+├── components/                   # Reusable Vue components
+│   ├── Header.vue                # Global header with search bar
+│   ├── ProductCard.vue           # Card component for product summary
+│   ├── ProductList.vue           # Displays a list/grid of ProductCard components
+│   ├── ProductDetail.vue         # Renders detailed product info
+│   └── ProductForm.vue           # Form used for editing/adding a product
+├── layouts/
+│   └── default.vue               # Default layout with common header/footer
+├── pages/                        # Pages generated via file-based routing
+│   ├── index.vue                 # Home page displaying the product list
+│   ├── product/                  
+│   │   ├── _id.vue               # Product detail page (dynamic route)
+│   │   └── _id/
+│   │       └── edit.vue          # Product edit page (dynamic route)
+├── services/
+│   └── productService.js         # Handles API calls and data management logic
+├── store/                        # Optional: Contains Pinia store modules if state management is used
+│   └── index.js
+├── nuxt.config.js                # Nuxt configuration file
+└── README.md                     # This documentation file with detailed instructions

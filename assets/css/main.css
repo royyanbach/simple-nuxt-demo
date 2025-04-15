@@ -1,0 +1,17 @@
+@import 'tailwindcss';
+@import "@nuxt/ui";
+
+@layer components {
+  .shop-content--paragraph {
+    @apply mb-2;
+  }
+  .shop-content--paragraph a {
+    @apply underline;
+  }
+  .shop-content--list {
+    @apply list-disc list-inside mb-2;
+  }
+  .shop-content--badge {
+    @apply inline-block mt-2;
+  }
+}
