@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import { useDebounceFn } from '@vueuse/core';
 
 const route = useRoute();
 const router = useRouter();
@@ -17,28 +18,21 @@ const productId = computed(() => {
   return match ? match[1] : null;
 });
 
-const productName = ref('Product');
-
-watch([productId, isProductDetailPage, isProductEditPage], async ([id, isDetail, isEdit]) => {
-  if (id && (isDetail || isEdit)) {
-    try {
-      const { data } = await useFetch(`/api/products/${id}`);
-      if (data.value) {
-        productName.value = data.value.name || 'Product';
-      }
-    } catch (error) {
-      console.error('Error fetching product:', error);
-    }
-  }
-}, { immediate: true });
-
-const handleSearch = () => {
-  if (!searchQuery.value.trim()) return;
-
+const debouncedSearchUpdate = useDebounceFn((query: string) => {
   router.push({
     path: '/products',
-    query: { search: searchQuery.value }
+    query: query ? { search: query } : undefined,
   });
+}, 300);
+
+watch(searchQuery, (newValue) => {
+  if (isProductsPage.value) {
+    debouncedSearchUpdate(newValue);
+  }
+});
+
+const handleSearch = () => {
+  debouncedSearchUpdate(searchQuery.value);
 };
 
 const goBack = () => {
@@ -46,12 +40,17 @@ const goBack = () => {
 };
 
 const goToEditProduct = () => {
+  if (!productId.value) return;
   router.push(`/products/${productId.value}/edit`);
 };
 
 watch(() => route.query.search, (newQuery) => {
-  if (newQuery && isProductsPage.value) {
-    searchQuery.value = newQuery as string;
+  const currentQuery = (newQuery as string || '');
+  if (searchQuery.value !== currentQuery) {
+    searchQuery.value = currentQuery;
+  }
+  if (!isProductsPage.value && !newQuery) {
+    searchQuery.value = '';
   }
 }, { immediate: true });
 </script>
@@ -105,7 +104,7 @@ watch(() => route.query.search, (newQuery) => {
             />
           </div>
 
-          <h3 class="grow text-xl text-gray-800 dark:text-white">{{ productName }}</h3>
+          <h3 class="grow text-xl text-gray-800 dark:text-white">Product Details</h3>
 
           <UButton
             color="primary"
@@ -126,7 +125,7 @@ watch(() => route.query.search, (newQuery) => {
               @click="goBack"
             />
             <span class="font-medium text-gray-800 dark:text-white truncate max-w-[200px] md:max-w-[400px]">
-              Edit Product - {{ productName }}
+              Edit Product
             </span>
           </div>
         </template>

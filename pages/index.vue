@@ -1,43 +1,34 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import { useProducts } from '~/services/productService';
+import type { Product } from '~/types';
+import ProductList from '~/components/ProductList.vue';
 
-interface Product {
-    id: number;
-    gvtId: number;
-    name: string;
-    productTagline: string;
-    shortDescription: string;
-    longDescription: string;
-    logoLocation: string;
-    productUrl: string;
-    voucherTypeName: string;
-    orderUrl: string;
-    productTitle: string;
-    variableDenomPriceMinAmount: string;
-    variableDenomPriceMaxAmount: string;
-    __typename: string;
-}
+// Define reactive refs for pagination if needed for controls later
+const currentPage = ref(1);
+const itemsPerPage = ref(2); // Keep the limit consistent with previous code for now
 
-interface ApiResponse {
-    data: Product[];
-    pagination: {
-        total: number;
-        page: number;
-        limit: number;
-        totalPages: number;
-    }
-}
-
-const { data, pending, error } = await useFetch<ApiResponse>('/api/products', {
-  query: {
-    page: 1,
-    limit: 2
-  }
+// Use the composable to fetch products
+const { data: apiResponse, pending, error } = await useProducts({
+  page: currentPage,
+  limit: itemsPerPage,
 });
 
-const latestProducts = computed(() => {
-    return data.value?.data || [];
+// Adjust computed property to access data from the nested structure
+const latestProducts = computed<Product[]>(() => {
+    return apiResponse.value?.data || [];
 });
+
+// Computed for pagination info if needed
+// const paginationInfo = computed(() => {
+//     return apiResponse.value?.pagination;
+// });
+
+// Function to handle page changes (example)
+// const handlePageChange = (newPage: number) => {
+//   currentPage.value = newPage;
+//   // The useFetch inside useProducts will automatically refetch due to the query being computed
+// };
 </script>
 
 <template>
@@ -77,7 +68,7 @@ const latestProducts = computed(() => {
       </div>
 
       <div v-if="pending" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <USkeleton v-for="n in 5" :key="n" class="h-64 w-full rounded-lg" />
+        <USkeleton v-for="n in itemsPerPage" :key="`skeleton-${n}`" class="h-64 w-full rounded-lg" />
       </div>
 
       <div v-else-if="error" class="text-center py-10">
@@ -87,41 +78,7 @@ const latestProducts = computed(() => {
         </p>
       </div>
 
-      <div v-else-if="latestProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div
-          v-for="product in latestProducts"
-          :key="product.id"
-          class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200"
-        >
-          <div class="p-4">
-            <div class="aspect-w-16 aspect-h-9 mb-3">
-              <img
-                :src="product.logoLocation"
-                :alt="`${product.name} Logo`"
-                class="object-cover w-full h-32 rounded"
-                loading="lazy"
-              />
-            </div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
-              {{ product.name }}
-            </h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-2">
-              {{ product.productTagline }}
-            </p>
-          </div>
-          <div class="px-4 pb-4">
-            <NuxtLink :to="`/products/${product.id}`" class="w-full">
-              <UButton
-                color="primary"
-                variant="solid"
-                block
-              >
-                View Details
-              </UButton>
-            </NuxtLink>
-          </div>
-        </div>
-      </div>
+      <ProductList v-else-if="latestProducts.length > 0" :products="latestProducts" />
 
       <div v-else class="text-center py-10">
         <UIcon name="i-heroicons-circle-stack" class="text-4xl text-gray-400 dark:text-gray-500 mx-auto" />

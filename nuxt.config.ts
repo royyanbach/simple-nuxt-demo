@@ -4,7 +4,6 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',
@@ -12,9 +11,18 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/test-utils',
     '@nuxt/ui',
+    'nitro-cloudflare-dev'
   ],
   css: ['~/assets/css/main.css'],
   vite: {
     plugins: [tailwindcss()],
+  },
+  nitro: {
+    preset: "cloudflare-pages",
+
+    cloudflare: {
+      deployConfig: true,
+      nodeCompat: true
+    }
   },
 });
